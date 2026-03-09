@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SA-MP · admin panel modern</title>
+    <!-- Fonts & Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(145deg, #0c111d 0%, #141d2f 100%);
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+            color: #eef5ff;
+            position: relative;
+        }
+
+        /* background grid halus */
+        body::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                linear-gradient(#1e2b3f 1px, transparent 1px),
+                linear-gradient(90deg, #1e2b3f 1px, transparent 1px);
+            background-size: 45px 45px;
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        /* container utama */
+        .admin-dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* header keren */
+        .header-panel {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
+            background: rgba(18, 30, 45, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid #2f4b70;
+            border-radius: 40px;
+            padding: 1rem 2rem;
+            box-shadow: 0 20px 35px -10px #00000080, 0 0 0 1px #3e6c9e inset;
+        }
+
+        .logo-area h1 {
+            font-weight: 700;
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #ffffff, #9fc5ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .logo-area span {
+            font-size: 0.9rem;
+            color: #9bbce0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 5px;
+        }
+
+        .phpmyadmin-badge {
+            background: #1b3852;
+            border-radius: 40px;
+            padding: 0.8rem 1.8rem;
+            border: 1px solid #4799d4;
+            box-shadow: 0 0 15px #0055ff80;
+            transition: 0.2s;
+        }
+
+        .phpmyadmin-badge a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .phpmyadmin-badge i {
+            color: #ffb86b;
+            font-size: 1.6rem;
+        }
+
+        .phpmyadmin-badge:hover {
+            background: #1f4a6b;
+            border-color: #6cb1ff;
+            transform: scale(1.02);
+        }
+
+        /* grid laporan & form */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+            gap: 1.8rem;
+            margin-bottom: 2.2rem;
+        }
+
+        /* card modern */
+        .card-modern {
+            background: rgba(16, 28, 44, 0.75);
+            backdrop-filter: blur(8px);
+            border: 1px solid #32587b;
+            border-radius: 38px;
+            padding: 1.8rem 1.6rem;
+            box-shadow: 0 25px 40px -18px #000000, 0 0 0 1px #3e6b8f inset;
+            transition: 0.2s ease;
+        }
+
+        .card-modern:hover {
+            border-color: #4f9eff;
+            box-shadow: 0 30px 50px -18px #1e90ff, 0 0 0 1px #77b5ff inset;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #d3ecff;
+            border-bottom: 2px solid #2f6792;
+            padding-bottom: 0.5rem;
+        }
+
+        .card-title i {
+            color: #5db0ff;
+            font-size: 1.8rem;
+        }
+
+        /* form styling */
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #9ac2e3;
+            margin-bottom: 0.3rem;
+            font-weight: 600;
+        }
+
+        .input-futuristic {
+            width: 100%;
+            background: #102433;
+            border: 2px solid #284a6b;
+            border-radius: 50px;
+            padding: 0.9rem 1.2rem;
+            font-size: 1rem;
+            color: white;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .input-futuristic:focus {
+            border-color: #3f9eff;
+            box-shadow: 0 0 0 3px #1e90ff30, 0 0 15px #0077ff;
+        }
+
+        .btn-prime {
+            background: linear-gradient(145deg, #1f4e7a, #123a5a);
+            border: none;
+            border-radius: 60px;
+            padding: 0.9rem 2rem;
+            font-weight: 700;
+            font-size: 1rem;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #4080b0;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 8px 0 #0b1f30;
+        }
+
+        .btn-prime i {
+            font-size: 1.2rem;
+            color = #b3e0ff;
+        }
+
+        .btn-prime:hover {
+            background: #256ea8;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 0 #0b1f30, 0 0 25px #0077ff;
+        }
+
+        .btn-prime:active {
+            transform: translateY(5px);
+            box-shadow: 0 5px 0 #0b1f30;
+        }
+
+        .btn-danger {
+            background: linear-gradient(145deg, #722f4b, #531f34);
+            border: 1px solid #b14a75;
+            box-shadow: 0 8px 0 #2d1422;
+        }
+
+        .btn-danger:hover {
+            background: #94405f;
+            border-color: #ff7aa3;
+        }
+
+        .btn-warning {
+            background: linear-gradient(145deg, #855723, #5f3d16);
+            border: 1px solid #cb9842;
+            box-shadow: 0 8px 0 #402d0f;
+        }
+
+        /* tabel area */
+        .table-section {
+            background: rgba(16, 28, 44, 0.75);
+            backdrop-filter: blur(8px);
+            border-radius: 38px;
+            border: 1px solid #32587b;
+            padding: 1.8rem 1.6rem;
+            margin-top: 2rem;
+        }
+
+        .table-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .table-header h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(145deg, #fff, #adcbff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .badge-empty {
+            background: #263f59;
+            border-radius: 60px;
+            padding: 0.3rem 1.2rem;
+            font-size: 0.8rem;
+            border: 1px solid #628bb2;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 10px;
+        }
+
+        th {
+            text-align: left;
+            padding: 0.8rem 1rem;
+            color: #b3d9ff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+            background: #1f3853;
+            border-radius: 30px 30px 10px 10px;
+        }
+
+        td {
+            background: rgba(25, 45, 65, 0.7);
+            padding: 1rem;
+            border-radius: 30px;
+            border: 1px solid #315e83;
+            font-weight: 500;
+        }
+
+        .status-badge {
+            background: #2a4f6e;
+            border-radius: 30px;
+            padding: 0.3rem 1rem;
+            font-size: 0.8rem;
+            display: inline-block;
+            border: 1px solid #6fbbff;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #a6c9ed;
+            font-size: 1.1rem;
+        }
+
+        .no-data i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-note {
+            margin-top: 2rem;
+            display: flex;
+            justify-content: flex-end;
+            color: #628db2;
+            gap: 20px;
+        }
+
+        /* phpMyAdmin con */
+        .pma-connect-bar {
+            background: #0e2740;
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            margin: 1.5rem 0 0.5rem;
+            border: 1px solid #2a79b7;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .pma-detail {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .pma-detail i {
+            font-size: 2rem;
+            color: #fcb045;
+        }
+    </style>
+</head>
+<body>
+    <div class="admin-dashboard">
+        <!-- header -->
+        <div class="header-panel">
+            <div class="logo-area">
+                <h1><i class="fas fa-shield-halded" style="margin-right: 10px;"></i> PANEL ADMIN SA-MP</h1>
+                <span><i class="fas fa-server"></i> Laporan & Manajemen Pemain · versi 2.0 modern</span>
+            </div>
+            <!-- PHPMyAdmin Koneksi langsung (simulasi terhubung) -->
+            <div class="phpmyadmin-badge">
+                <a href="#" target="_blank" id="pmaLink">
+                    <i class="fas fa-database"></i> 
+                    <span>🔌 phpMyAdmin • online <i class="fas fa-check-circle" style="color:#5effa0;"></i></span>
+                </a>
+            </div>
+        </div>
+
+        <!-- grid form tambah, ban, hapus -->
+        <div class="dashboard-grid">
+            <!-- TAMBAH PEMAIN -->
+            <div class="card-modern">
+                <div class="card-title"><i class="fas fa-user-plus"></i> TAMBAH PEMAIN</div>
+                <div class="form-group">
+                    <label><i class="far fa-id-card"></i> Kode Pemain</label>
+                    <input class="input-futuristic" type="text" placeholder="cth: SP_12345" id="kode_tambah">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-user"></i> Nama Pemain</label>
+                    <input class="input-futuristic" type="text" placeholder="Nickname dalam game" id="nama_tambah">
+                </div>
+                <button class="btn-prime" onclick="simulatePhpmyadmin('tambah')"><i class="fas fa-save"></i> DAFTARKAN</button>
+            </div>
+
+            <!-- BAN PEMAIN -->
+            <div class="card-modern">
+                <div class="card-title"><i class="fas fa-gavel"></i> BAN PEMAIN</div>
+                <div class="form-group">
+                    <label><i class="far fa-id-card"></i> Kode Pemain</label>
+                    <input class="input-futuristic" type="text" placeholder="Kode pemain" id="kode_ban">
+                </div>
+                <div class="form-group">
+                    <label><i class="fas fa-ban"></i> Alasan Ban</label>
+                    <input class="input-futuristic" type="text" placeholder="Cheating / toxic" id="alasan_ban">
+                </div>
+                <div class="form-group">
+                    <label><i class="far fa-calendar-alt"></i> Tgl Unban (YYYY-MM-DD)</label>
+                    <input class="input-futuristic" type="text" placeholder="2025-12-31" id="tgl_unban">
+                </div>
+                <button class="btn-prime btn-warning" onclick="simulatePhpmyadmin('ban')"><i class="fas fa-hammer"></i> BAN</button>
+            </div>
+
+            <!-- HAPUS PERMANEN (UNWL) -->
+            <div class="card-modern">
+                <div class="card-title"><i class="fas fa-trash-alt"></i> HAPUS PERMANEN (UNWL)</div>
+                <div class="form-group">
+                    <label><i class="far fa-id-card"></i> Kode Pemain</label>
+                    <input class="input-futuristic" type="text" placeholder="Kode pemain" id="kode_hapus">
+                </div>
+                <button class="btn-prime btn-danger" onclick="simulatePhpmyadmin('hapus')"><i class="fas fa-skull-crosswind"></i> HAPUS</button>
+            </div>
+        </div>
+
+        <!-- bar koneksi phpmyadmin (simulasi konfigurasi) -->
+        <div class="pma-connect-bar">
+            <div class="pma-detail">
+                <i class="fas fa-link"></i>
+                <span><strong>🔗 Koneksi phpMyAdmin:</strong> localhost / SA-MP_DB · user: <span style="color:#8ecaff;">samp_admin</span> </span>
+            </div>
+            <div>
+                <span class="badge-empty" style="background: #105a7a;"><i class="fas fa-plug"></i> connected</span>
+            </div>
+        </div>
+
+        <!-- DAFTAR PEMAIN TABLE -->
+        <div class="table-section">
+            <div class="table-header">
+                <h2><i class="fas fa-list-ul"></i> DAFTAR PEMAIN</h2>
+                <span class="badge-empty"><i class="fas fa-database"></i> 0 record</span>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Kode</th>
+                        <th>Nama</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Data masih kosong sesuai deskripsi "Belum ada pemain!" -->
+                    <tr>
+                        <td colspan="4" class="no-data">
+                            <i class="fas fa-user-slash"></i><br>
+                            Belum ada pemain! 
+                            <div style="font-size:0.9rem; margin-top:5px;">gunakan form tambah untuk mengisi database</div>
+                        </td>
+                    </tr>
+                    <!-- contoh jika ada nanti bisa di-loop, tapi kita tampilkan sesuai contoh bahwa masih kosong -->
+                </tbody>
+            </table>
+            <!-- kecil catatan -->
+            <div style="margin-top: 1rem; display: flex; gap: 20px; justify-content: flex-end; color: #6f9ac9;">
+                <span><i class="far fa-clock"></i> last sync: -</span>
+                <span><i class="fas fa-php"></i> mysql 8.0</span>
+            </div>
+        </div>
+
+        <!-- footer dengan informasi tambahan untuk koneksi phpmyadmin -->
+        <div class="footer-note">
+            <span><i class="fas fa-code"></i> Panel SA-MP dirancang dengan integrasi phpMyAdmin</span>
+            <span>📋 <span onclick="alert('Config: server=\"localhost\"; database=\"samp_db\"; user=\"root\"; (ganti sesuai kebutuhan)')" style="cursor:pointer; border-bottom:1px dashed #77b5ff;">koneksi disini</span></span>
+        </div>
+    </div>
+
+    <!-- Script simulasi koneksi ke phpMyAdmin dan popup konfigurasi -->
+    <script>
+        // fungsi untuk mensimulasikan aksi form dan mengarahkan ke phpMyAdmin (untuk demo)
+        function simulatePhpmyadmin(action) {
+            let message = '';
+            if (action === 'tambah') {
+                let kode = document.getElementById('kode_tambah').value || '[kosong]';
+                let nama = document.getElementById('nama_tambah').value || '[kosong]';
+                message = `🔍 SIMULASI: Tambah pemain (Kode: ${kode}, Nama: ${nama})\n\nData akan dimasukkan ke database SA-MP.\nBuka phpMyAdmin untuk melihat tabel 'pemain'.`;
+            } else if (action === 'ban') {
+                let kode = document.getElementById('kode_ban').value || '[kosong]';
+                let alasan = document.getElementById('alasan_ban').value || '[kosong]';
+                let tgl = document.getElementById('tgl_unban').value || '[kosong]';
+                message = `⛔ BAN: Kode ${kode} | Alasan: ${alasan} | Unban: ${tgl}\n\nQuery akan menjalankan UPDATE bans SET ... di phpMyAdmin.`;
+            } else if (action === 'hapus') {
+                let kode = document.getElementById('kode_hapus').value || '[kosong]';
+                message = `❌ HAPUS PERMANEN (UNWL) untuk kode: ${kode}\n\nData akan dihapus dari database. Cek phpMyAdmin -> tabel pemain.`;
+            }
+            // tambahkan opsi redirect / popup phpMyAdmin
+            if (confirm(message + '\n\nLanjutkan ke phpMyAdmin? (demo)')) {
+                // arahkan ke phpMyAdmin (atau panel simulasi)
+                window.open('https://www.phpmyadmin.net/', '_blank'); // hanya demo, ganti dengan url phpmyadmin lokal jika ada
+            }
+        }
+
+        // menambahkan event untuk link phpmyadmin badge
+        document.getElementById('pmaLink').addEventListener('click', function(e){
+            e.preventDefault();
+            if(confirm('Buka phpMyAdmin (koneksi ke server lokal)? untuk demo akan membuka website phpMyAdmin.')){
+                window.open('https://www.phpmyadmin.net/', '_blank');
+            }
+        });
+
+        // fungsi tambahan: alert konfigurasi database
+        function showDbConfig() {
+            alert("📁 Konfigurasi database:\nHost: localhost\nDatabase: samp_db\nUser: samp_admin\nPassword: ••••••\nTabel: pemain, bans, logs");
+        }
+
+        // tambahkan ke element terakhir 
+        document.querySelector('.footer-note span:last-child').addEventListener('click', showDbConfig);
+    </script>
+
+    <!-- Catatan: Untuk koneksi sesungguhnya, file ini harus dijalankan di server dengan PHP.
+         Koneksi MySQLi / PDO dapat ditambahkan dengan mengganti aksi form ke file proses.php.
+         Desain sudah siap untuk diintegrasikan dengan backend phpMyAdmin. -->
+</body>
+</html>
